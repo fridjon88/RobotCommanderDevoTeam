@@ -1,4 +1,4 @@
-package com.devoteam.robotcommander;
+package com.devoteam.robotcommander.unittests;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,5 +9,4 @@ class RobotCommanderApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
