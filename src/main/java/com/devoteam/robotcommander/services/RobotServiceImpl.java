@@ -21,18 +21,23 @@ public class RobotServiceImpl implements RobotService {
     public Robot initializeRobotPosition(String values, Room room) {
         String[] strings = validateInputLength(values, 3);
         Dimensions validDimensions = getValidateDimensions(strings);
-        Direction direction = Direction.valueOf(strings[2]);
+        Direction direction;
+        try {
+            direction = Direction.valueOf(strings[2].toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Unknown direction: " + strings[2].toUpperCase());
+        }
 
         isValidPosition(validDimensions, room);
 
-        return new Robot(validDimensions.depth, validDimensions.width, direction);
+        return new Robot(validDimensions.width, validDimensions.depth, direction);
     }
 
     private void isValidPosition(Dimensions dimensions, Room room) {
-        boolean widthIsInRange = dimensions.width() > room.width() || dimensions.width() > 0;
-        boolean depthIsInRange = dimensions.depth() > room.depth() || dimensions.depth() > 0;
-        if (!(widthIsInRange || depthIsInRange)) {
-            throw new IllegalStateException(MessageFormat.format("Robot is out of range! Can not go to W:{0} D:{1}", dimensions.width(), dimensions.depth()));
+        boolean widthIsInRange = dimensions.width() <= room.width() && dimensions.width() > 0;
+        boolean depthIsInRange = dimensions.depth() <= room.depth() && dimensions.depth() > 0;
+        if (!(widthIsInRange && depthIsInRange)) {
+            throw new IllegalArgumentException(MessageFormat.format("Robot is out of range! Can not go to W: {0} D: {1}", dimensions.width(), dimensions.depth()));
         }
     }
 
@@ -54,11 +59,11 @@ public class RobotServiceImpl implements RobotService {
             width = Long.parseLong(input[0]);
             depth = Long.parseLong(input[1]);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(MessageFormat.format("Your input is not supported - Width:{0} and Depth:{1}", input[0], input[1]));
+            throw new IllegalArgumentException(MessageFormat.format("Your input is not supported - Width: {0} and Depth: {1}", input[0], input[1]));
         }
 
         if (width <= 0 || depth <= 0) {
-            throw new IllegalArgumentException(MessageFormat.format("Your input is not supported - Width:{0} and Depth:{1}", input[0], input[1]));
+            throw new IllegalArgumentException(MessageFormat.format("Your input is not supported - Width: {0} and Depth: {1}", input[0], input[1]));
         }
         return new Dimensions(width, depth);
     }
