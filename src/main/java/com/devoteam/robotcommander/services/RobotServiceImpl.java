@@ -6,6 +6,7 @@ import com.devoteam.robotcommander.enums.Direction;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 @Service
 public class RobotServiceImpl implements RobotService {
@@ -28,16 +29,51 @@ public class RobotServiceImpl implements RobotService {
             throw new IllegalArgumentException("Unknown direction: " + strings[2].toUpperCase());
         }
 
-        isValidPosition(validDimensions, room);
+        isValidPosition(validDimensions.depth, validDimensions.width, room);
 
         return new Robot(validDimensions.width, validDimensions.depth, direction);
     }
 
-    private void isValidPosition(Dimensions dimensions, Room room) {
-        boolean widthIsInRange = dimensions.width() <= room.width() && dimensions.width() > 0;
-        boolean depthIsInRange = dimensions.depth() <= room.depth() && dimensions.depth() > 0;
+    public Robot moveRobot(String movementString, Robot robot, Room room) {
+        validateInputLength(movementString, 1);
+        List<String> input = movementString.chars()
+                .mapToObj(c -> String.valueOf((char) c))
+                .toList();
+
+        Robot movedRobot = new Robot(robot.getWidth(), robot.getDepth(), robot.getDirection());
+
+        for (String i : input) {
+
+            switch (i) {
+                // Makes use of modulus to circle through the directions
+                case "L" ->
+                        movedRobot.setDirection(Direction.getDirection((robot.getDirection().getDirectionValue() - 1) % 4));
+                case "R" ->
+                        movedRobot.setDirection(Direction.getDirection((robot.getDirection().getDirectionValue() + 1) % 4));
+                case "F" -> movedRobot = moveRobotForward(movedRobot, room);
+                default -> throw new IllegalArgumentException(MessageFormat.format("Invalid movement: {0}", i));
+            }
+        }
+
+        return movedRobot;
+    }
+
+    private Robot moveRobotForward(Robot robot, Room room) {
+        switch (robot.getDirection()) {
+            case N -> robot.setDepth(robot.getDepth() + 1);
+            case E -> robot.setWidth(robot.getWidth() + 1);
+            case S -> robot.setDepth(robot.getDepth() - 1);
+            case W -> robot.setWidth(robot.getWidth() - 1);
+        }
+        isValidPosition(robot.getWidth(), robot.getDepth(), room);
+        return robot;
+    }
+
+    private void isValidPosition(long width, long depth, Room room) {
+        boolean widthIsInRange = width <= room.width() && width > 0;
+        boolean depthIsInRange = depth <= room.depth() && depth > 0;
         if (!(widthIsInRange && depthIsInRange)) {
-            throw new IllegalArgumentException(MessageFormat.format("Robot is out of range! Can not go to W: {0} D: {1}", dimensions.width(), dimensions.depth()));
+            throw new IllegalArgumentException(MessageFormat.format("Robot is out of range! Can not go to W: {0} D: {1}", width, depth));
         }
     }
 

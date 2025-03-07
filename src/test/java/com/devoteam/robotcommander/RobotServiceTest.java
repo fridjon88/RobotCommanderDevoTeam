@@ -90,4 +90,20 @@ public class RobotServiceTest {
         Assertions.assertEquals(expectedMessage, illegalArgumentException.getMessage());
     }
 
+    @ParameterizedTest
+    @CsvSource({"RF, 10, 10, E"})
+    @CsvSource({"RFLLF, 9, 10, W"})
+    public void moveRobotSuccess(String input, String expectedWidth, String expectedDepth, String expectedFacingDirection) {
+        // setup
+        RobotService robotService = new RobotServiceImpl();
+
+        // act
+        Robot robot = robotService.moveRobot(input, new Robot(9, 10, Direction.N), new Room(10, 10));
+
+        // assert
+        Assertions.assertEquals(Long.valueOf(expectedWidth), robot.getWidth());
+        Assertions.assertEquals(Long.valueOf(expectedDepth), robot.getDepth());
+        Assertions.assertEquals(expectedFacingDirection, robot.getDirection().toString());
+
+    }
 }
