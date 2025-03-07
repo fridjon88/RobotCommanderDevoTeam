@@ -76,7 +76,6 @@ public class RobotServiceTest {
     @CsvSource({"1 0 N, Your input is not supported - Width: 1 and Depth: 0"})
     @CsvSource({"N E S, Your input is not supported - Width: N and Depth: E"})
     @CsvSource({"1 1 B, Unknown direction: B"})
-    @CsvSource({"10 10 N, Unknown direction: B"})
     @CsvSource({"11 11 N, Robot is out of range! Can not go to W: 11 D: 11"})
     @CsvSource({"1 0 N, Your input is not supported - Width: 1 and Depth: 0"})
     @CsvSource({"-1 1 N, Your input is not supported - Width: -1 and Depth: 1"})
@@ -93,6 +92,13 @@ public class RobotServiceTest {
     @ParameterizedTest
     @CsvSource({"RF, 10, 10, E"})
     @CsvSource({"RFLLF, 9, 10, W"})
+    @CsvSource({"F, 9, 9, N"})
+    @CsvSource({"FR, 9, 9, E"})
+    @CsvSource({"FL, 9, 9, W"})
+    @CsvSource({"FLL, 9, 9, S"})
+    @CsvSource({"LL, 9, 10, S"})
+    @CsvSource({"FLLLL, 9, 9, N"})
+    @CsvSource({"FRRRR, 9, 9, N"})
     public void moveRobotSuccess(String input, String expectedWidth, String expectedDepth, String expectedFacingDirection) {
         // setup
         RobotService robotService = new RobotServiceImpl();
@@ -104,6 +110,21 @@ public class RobotServiceTest {
         Assertions.assertEquals(Long.valueOf(expectedWidth), robot.getWidth());
         Assertions.assertEquals(Long.valueOf(expectedDepth), robot.getDepth());
         Assertions.assertEquals(expectedFacingDirection, robot.getDirection().toString());
+    }
 
+    @ParameterizedTest
+    @CsvSource({"A, Invalid movement: A"})
+    @CsvSource({"RFLAR, Invalid movement: A"})
+    @CsvSource({" , Invalid number of arguments"})
+    @CsvSource({"RFF, Robot is out of range! Can not go to W: 11 D: 10"})
+    @CsvSource({"RFFLLFF, Robot is out of range! Can not go to W: 11 D: 10"})
+    public void moveRobotThrows(String input, String exceptionMessage) {
+        // setup
+        RobotService robotService = new RobotServiceImpl();
+
+        // act & assert
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class,
+                () -> robotService.moveRobot(input, new Robot(9, 10, Direction.N), new Room(10, 10)));
+        Assertions.assertEquals(exceptionMessage, illegalArgumentException.getMessage());
     }
 }

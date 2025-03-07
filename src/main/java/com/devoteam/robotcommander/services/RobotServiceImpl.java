@@ -45,11 +45,11 @@ public class RobotServiceImpl implements RobotService {
         for (String i : input) {
 
             switch (i) {
-                // Makes use of modulus to circle through the directions
+                // Makes use of modulus to circle through the directions - +4 added to left to avoid negative numbers
                 case "L" ->
-                        movedRobot.setDirection(Direction.getDirection((robot.getDirection().getDirectionValue() - 1) % 4));
+                        movedRobot.setDirection(Direction.getDirection((movedRobot.getDirection().getDirectionValue() - 1 + 4) % 4));
                 case "R" ->
-                        movedRobot.setDirection(Direction.getDirection((robot.getDirection().getDirectionValue() + 1) % 4));
+                        movedRobot.setDirection(Direction.getDirection((movedRobot.getDirection().getDirectionValue() + 1) % 4));
                 case "F" -> movedRobot = moveRobotForward(movedRobot, room);
                 default -> throw new IllegalArgumentException(MessageFormat.format("Invalid movement: {0}", i));
             }
@@ -60,9 +60,9 @@ public class RobotServiceImpl implements RobotService {
 
     private Robot moveRobotForward(Robot robot, Room room) {
         switch (robot.getDirection()) {
-            case N -> robot.setDepth(robot.getDepth() + 1);
+            case N -> robot.setDepth(robot.getDepth() - 1);
             case E -> robot.setWidth(robot.getWidth() + 1);
-            case S -> robot.setDepth(robot.getDepth() - 1);
+            case S -> robot.setDepth(robot.getDepth() + 1);
             case W -> robot.setWidth(robot.getWidth() - 1);
         }
         isValidPosition(robot.getWidth(), robot.getDepth(), room);
