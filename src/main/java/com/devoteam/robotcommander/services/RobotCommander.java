@@ -1,5 +1,6 @@
 package com.devoteam.robotcommander.services;
 
+import com.devoteam.robotcommander.DTOs.Robot;
 import com.devoteam.robotcommander.DTOs.Room;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,17 @@ public class RobotCommander {
         while (room == null) {
             try {
                 room = robotService.initializeRoom(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                System.out.println("Try again...");
+            }
+        }
+
+        System.out.println("Insert desired Robot placement - width, depth and what direction it should face");
+        Robot robot = null;
+        while (robot == null) {
+            try {
+                robot = robotService.initializeRobotPosition(scanner.nextLine(), room);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 System.out.println("Try again...");
